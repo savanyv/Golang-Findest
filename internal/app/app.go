@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/savanyv/Golang-Findest/internal/config"
 	"github.com/savanyv/Golang-Findest/internal/config/database"
+	"github.com/savanyv/Golang-Findest/internal/middlewares"
 )
 
 type Server struct {
@@ -26,6 +27,10 @@ func (s *Server) Run() error {
 	if err != nil {
 		log.Println("failed to connect database")
 	}
+
+	// Setup Middlewares
+	s.e.Use(middlewares.CORSMiddleware)
+	s.e.Use(middlewares.MethodValidationMiddleware)
 
 	// Start Server
 	if err := s.e.Start(":7000"); err != nil {
