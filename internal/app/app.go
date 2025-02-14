@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/savanyv/Golang-Findest/internal/config"
 	"github.com/savanyv/Golang-Findest/internal/config/database"
+	"github.com/savanyv/Golang-Findest/internal/delivery/routes"
 	"github.com/savanyv/Golang-Findest/internal/middlewares"
 )
 
@@ -31,6 +32,9 @@ func (s *Server) Run() error {
 	// Setup Middlewares
 	s.e.Use(middlewares.CORSMiddleware)
 	s.e.Use(middlewares.MethodValidationMiddleware)
+
+	// Setup Routes
+	routes.RegisterRoutes(s.e)
 
 	// Start Server
 	if err := s.e.Start(":7000"); err != nil {
