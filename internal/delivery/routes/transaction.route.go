@@ -19,4 +19,5 @@ func transactionRoutes(e *echo.Group) {
 	handler := handlers.NewTransactionHandler(usecase)
 
 	e.POST("/transactions", handler.CreateTransaction, middlewares.AuthMiddlewares(jwtService))
+	e.GET("/transactions", handler.GetTransaction)
 }

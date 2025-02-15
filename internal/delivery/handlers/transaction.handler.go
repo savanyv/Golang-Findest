@@ -61,3 +61,37 @@ func (h *TransactionHandler) CreateTransaction(c echo.Context) error {
 		"data":    response,
 	})
 }
+
+func (h *TransactionHandler) GetTransaction(c echo.Context) error {
+	var userID *uint
+	var status *string
+
+	userIDStr := c.QueryParam("user_id")
+	if userIDStr != "" {
+		parsedUserID, err := strconv.ParseUint(userIDStr, 10, 32)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"error": "failed to parse user id",
+			})
+		}
+		convertedUserID := uint(parsedUserID)
+		userID = &convertedUserID
+	}
+
+	statusStr := c.QueryParam("status")
+	if statusStr != "" {
+		status = &statusStr
+	}
+
+	response, err := h.usecase.GetTransaction(userID, status)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "successfully get transactions",
+		"data":    response,
+	})
+}

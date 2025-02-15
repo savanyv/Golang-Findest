@@ -9,7 +9,7 @@ import (
 
 type TransactionRepository interface {
 	CreateTransaction(transaction *models.Transaction) (*models.Transaction, error)
-	GetTransactionByUserID(userID uint) ([]models.Transaction, error)
+	GetTransaction(userID *uint, status *string) ([]models.Transaction, error)
 	GetTransactionByID(transactionID uint) (*models.Transaction, error)
 	GetTotalSuccessfullTransaction(startDate, endDate time.Time) (float64, error)
 	UpdateStatusTransaction(transactionID uint, status string) (*models.Transaction, error)
@@ -34,9 +34,19 @@ func (r *transactionRepository) CreateTransaction(transaction *models.Transactio
 	return transaction, nil
 }
 
-func (r *transactionRepository) GetTransactionByUserID(userID uint) ([]models.Transaction, error) {
+func (r *transactionRepository) GetTransaction(userID *uint, status *string) ([]models.Transaction, error) {
 	var transactions []models.Transaction
-	if err := r.db.Where("user_id = ?", userID).Find(&transactions).Error; err != nil {
+	query := r.db.Model(&models.Transaction{})
+
+	if userID != nil {
+		query = query.Where("user_id = ?", *userID)
+	}
+
+	if status != nil {
+		query = query.Where("status = ?", status)
+	}
+
+	if err := query.Find(&transactions).Error; err != nil {
 		return nil, err
 	}
 
