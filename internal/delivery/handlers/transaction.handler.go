@@ -1,0 +1,63 @@
+package handlers
+
+import (
+	"net/http"
+	"strconv"
+
+	"github.com/labstack/echo/v4"
+	dtos "github.com/savanyv/Golang-Findest/internal/dto"
+	"github.com/savanyv/Golang-Findest/internal/helpers"
+	"github.com/savanyv/Golang-Findest/internal/usecase"
+)
+
+type TransactionHandler struct {
+	usecase usecase.TransactionUsecase
+	validator *helpers.CustomValidator
+}
+
+func NewTransactionHandler(usecase usecase.TransactionUsecase) *TransactionHandler {
+	return &TransactionHandler{
+		usecase: usecase,
+		validator: helpers.NewValidator(),
+	}
+}
+
+func (h *TransactionHandler) CreateTransaction(c echo.Context) error {
+	userIDStr, ok := c.Get("userID").(string)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, echo.Map{
+			"error": "failed to get user id",
+		})
+	}
+	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": "failed to parse user id",
+		})
+	}
+
+	var req dtos.CreateTransactionRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": err.Error(),
+		})
+	}
+
+	if err := h.validator.Validate(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": "failed to validate request",
+		})
+	}
+
+	response, err := h.usecase.CreateTransaction(&req, uint(userID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusCreated, echo.Map{
+		"message": "successfully created transaction",
+		"data":    response,
+	})
+}

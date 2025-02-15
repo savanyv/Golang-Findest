@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -33,7 +34,7 @@ func NewJWTService() JWTService {
 
 func (j *jwtService) GenerateToken(userID uint, email string) (string, error) {
 	claims := &JWTClaim{
-		UserID: string(rune(userID)),
+		UserID: strconv.Itoa(int(userID)),
 		Email: email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer: j.issuer,

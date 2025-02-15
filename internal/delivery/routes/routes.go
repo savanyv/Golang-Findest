@@ -6,4 +6,5 @@ func RegisterRoutes(e *echo.Echo) {
 	api := e.Group("/api")
 
 	authRoutes(api)
+	transactionRoutes(api)
 }
