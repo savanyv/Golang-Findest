@@ -12,6 +12,7 @@ import (
 type TransactionUsecase interface {
 	CreateTransaction(req *dtos.CreateTransactionRequest, userID uint) (*dtos.TransactionResponse, error)
 	GetTransaction(userID *uint, status *string) ([]dtos.TransactionResponse, error)
+	GetTransactionByID(transactionID uint) (*dtos.TransactionResponse, error)
 }
 
 type transactionUsecase struct {
@@ -82,6 +83,31 @@ func (u *transactionUsecase) GetTransaction(userID *uint, status *string) ([]dto
 			Status:    t.Status,
 			CreatedAt: t.CreatedAt,
 		})
+	}
+
+	return response, nil
+}
+
+func (u *transactionUsecase) GetTransactionByID(transactionID uint) (*dtos.TransactionResponse, error) {
+	// check if user logged in
+	_, err := u.userRepo.GetUserByID(transactionID)
+	if err != nil {
+		return nil, errors.New("user not logged in")
+	}
+	
+	// get transaction
+	transaction, err := u.repo.GetTransactionByID(transactionID)
+	if err != nil {
+		return nil, errors.New("failed to get transaction")
+	}
+
+	// return response
+	response := &dtos.TransactionResponse{
+		ID:        transaction.ID,
+		UserID:    transaction.UserID,
+		Amount:    transaction.Amount,
+		Status:    transaction.Status,
+		CreatedAt: transaction.CreatedAt,
 	}
 
 	return response, nil

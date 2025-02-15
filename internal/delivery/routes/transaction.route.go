@@ -20,4 +20,5 @@ func transactionRoutes(e *echo.Group) {
 
 	e.POST("/transactions", handler.CreateTransaction, middlewares.AuthMiddlewares(jwtService))
 	e.GET("/transactions", handler.GetTransaction)
+	e.GET("/transactions/:id", handler.GetTransactionByID, middlewares.AuthMiddlewares(jwtService))
 }
