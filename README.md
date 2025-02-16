@@ -24,7 +24,7 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
 ## 🛠 Instalasi & Menjalankan Server
 1. **Clone repository**
    ```sh
-   git clone https://github.com/username/repo-name.git
+   git clone https://github.com/savanyv/Golang-Findest.git
    cd repo-name
      ```
    
@@ -202,7 +202,7 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
 - 📊 Get Dashboard Summary
 
      endpoint: ```GET /api/dashboard/summary```
-     
+
      response:
      ```json
      {
