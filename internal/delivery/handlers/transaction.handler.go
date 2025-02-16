@@ -164,3 +164,37 @@ func (h *TransactionHandler) UpdateStatusTransaction(c echo.Context) error {
 		"data": response,
 	})
 }
+
+func (h *TransactionHandler) DeleteTransaction(c echo.Context) error {
+	userIDStr, ok := c.Get("userID").(string)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, echo.Map{
+			"error": "failed to get user id",
+		})
+	}
+
+	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": "failed to parse user id",
+		})
+	}
+
+	transactionID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": "failed to parse transaction id",
+		})
+	}
+
+	err = h.usecase.DeleteTransaction(uint(userID), uint(transactionID))
+	if err != nil {
+		return c.JSON(http.StatusForbidden, echo.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "successfully delete transaction",
+	})
+}

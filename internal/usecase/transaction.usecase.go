@@ -14,6 +14,7 @@ type TransactionUsecase interface {
 	GetTransaction(userID *uint, status *string) ([]dtos.TransactionResponse, error)
 	GetTransactionByID(userID, transactionID uint) (*dtos.TransactionResponse, error)
 	UpdateStatusTransaction(transactionID uint, req *dtos.UpdateTranscationRequest) (*dtos.TransactionResponse, error)
+	DeleteTransaction(userID, transactionID uint) error
 }
 
 type transactionUsecase struct {
@@ -144,4 +145,25 @@ func (u *transactionUsecase) UpdateStatusTransaction(transactionID uint, req *dt
 	}
 
 	return &response, nil
+}
+
+func (u *transactionUsecase) DeleteTransaction(userID, transactionID uint) error {
+	// get transaction
+	transaction, err := u.repo.GetTransactionByID(transactionID)
+	if err != nil {
+		return errors.New("failed to get transaction by id")
+	}
+
+	// check if user is the owner of the transaction
+	if transaction.UserID != userID {
+		return errors.New("unauthorized to delete this transaction")
+	}
+
+	// delete transaction
+	err = u.repo.DeleteTransaction(transactionID)
+	if err != nil {
+		return errors.New("failed to delete transaction")
+	}
+
+	return nil
 }

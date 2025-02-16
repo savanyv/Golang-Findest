@@ -90,11 +90,7 @@ func (r *transactionRepository) UpdateStatusTransaction(transactionID uint, stat
 
 func (r *transactionRepository) DeleteTransaction(transactionID uint) error {
 	var transaction models.Transaction
-	if err := r.db.Where("id = ?", transactionID).First(&transaction).Error; err != nil {
-		return err
-	}
-
-	if err := r.db.Delete(&transaction).Error; err != nil {
+	if err := r.db.Delete(&transaction, transactionID).Error; err != nil {
 		return err
 	}
 
