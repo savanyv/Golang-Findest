@@ -45,7 +45,7 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
      ```sh
      go run cmd/main.go
      ```
-     Server Berjalan di localhost:7000
+     Server Berjalan di ```localhost:7000```
 ## 📖 API Documentation
 🔹Autentikasi
 
