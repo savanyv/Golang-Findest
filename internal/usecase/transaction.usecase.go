@@ -12,7 +12,8 @@ import (
 type TransactionUsecase interface {
 	CreateTransaction(req *dtos.CreateTransactionRequest, userID uint) (*dtos.TransactionResponse, error)
 	GetTransaction(userID *uint, status *string) ([]dtos.TransactionResponse, error)
-	GetTransactionByID(transactionID uint) (*dtos.TransactionResponse, error)
+	GetTransactionByID(userID, transactionID uint) (*dtos.TransactionResponse, error)
+	UpdateStatusTransaction(transactionID uint, req *dtos.UpdateTranscationRequest) (*dtos.TransactionResponse, error)
 }
 
 type transactionUsecase struct {
@@ -88,7 +89,7 @@ func (u *transactionUsecase) GetTransaction(userID *uint, status *string) ([]dto
 	return response, nil
 }
 
-func (u *transactionUsecase) GetTransactionByID(transactionID uint) (*dtos.TransactionResponse, error) {
+func (u *transactionUsecase) GetTransactionByID(userID, transactionID uint) (*dtos.TransactionResponse, error) {
 	// check if user logged in
 	_, err := u.userRepo.GetUserByID(transactionID)
 	if err != nil {
@@ -101,6 +102,11 @@ func (u *transactionUsecase) GetTransactionByID(transactionID uint) (*dtos.Trans
 		return nil, errors.New("failed to get transaction")
 	}
 
+	// check if user is the owner of the transaction
+	if transaction.UserID != userID {
+		return nil, errors.New("you are not authorized to view this transaction")
+	}
+
 	// return response
 	response := &dtos.TransactionResponse{
 		ID:        transaction.ID,
@@ -111,4 +117,31 @@ func (u *transactionUsecase) GetTransactionByID(transactionID uint) (*dtos.Trans
 	}
 
 	return response, nil
+}
+
+func (u *transactionUsecase) UpdateStatusTransaction(transactionID uint, req *dtos.UpdateTranscationRequest) (*dtos.TransactionResponse, error) {
+	// check if transaction exists
+	transaction, err := u.repo.GetTransactionByID(transactionID)
+	if err != nil {
+		return nil, errors.New("failed get tranasaction by id")
+	}
+
+	transaction.Status = req.Status
+
+	// update transaction
+	transaction, err = u.repo.UpdateStatusTransaction(transactionID, req.Status)
+	if err != nil {
+		return nil, errors.New("failed to update transaction")
+	}
+
+	// resposne
+	response := dtos.TransactionResponse{
+		ID: transaction.ID,
+		UserID: transaction.UserID,
+		Amount: transaction.Amount,
+		Status: transaction.Status,
+		CreatedAt: transaction.CreatedAt,
+	}
+
+	return &response, nil
 }

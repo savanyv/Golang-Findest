@@ -9,7 +9,7 @@ type CreateTransactionRequest struct {
 }
 
 type UpdateTranscationRequest struct {
-	Status string `json:"status"`
+	Status string `json:"status" validate:"required"`
 }
 
 type TransactionResponse struct {

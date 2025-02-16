@@ -97,10 +97,17 @@ func (h *TransactionHandler) GetTransaction(c echo.Context) error {
 }
 
 func (h *TransactionHandler) GetTransactionByID(c echo.Context) error {
-	_, ok := c.Get("userID").(string)
+	userIDStr, ok := c.Get("userID").(string)
 	if !ok {
 		return c.JSON(http.StatusUnauthorized, echo.Map{
 			"error": "failed to get user id",
+		})
+	}
+
+	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": "failed to parse user id",
 		})
 	}
 
@@ -111,9 +118,9 @@ func (h *TransactionHandler) GetTransactionByID(c echo.Context) error {
 		})
 	}
 
-	response, err := h.usecase.GetTransactionByID(uint(transactionID))
+	response, err := h.usecase.GetTransactionByID(uint(userID), uint(transactionID))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
+		return c.JSON(http.StatusForbidden, echo.Map{
 			"error": err.Error(),
 		})
 	}
@@ -121,5 +128,39 @@ func (h *TransactionHandler) GetTransactionByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "successfully get transaction",
 		"data":    response,
+	})
+}
+
+func (h *TransactionHandler) UpdateStatusTransaction(c echo.Context) error {
+	transactionID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": "failed to parse transaction id",
+		})
+	}
+
+	var req dtos.UpdateTranscationRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": err.Error(),
+		})
+	}
+
+	if err := h.validator.Validate(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": err.Error(),
+		})
+	}
+
+	response, err := h.usecase.UpdateStatusTransaction(uint(transactionID), &req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "successfully update status transaction",
+		"data": response,
 	})
 }
