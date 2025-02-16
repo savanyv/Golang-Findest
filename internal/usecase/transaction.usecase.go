@@ -15,6 +15,7 @@ type TransactionUsecase interface {
 	GetTransactionByID(userID, transactionID uint) (*dtos.TransactionResponse, error)
 	UpdateStatusTransaction(transactionID uint, req *dtos.UpdateTranscationRequest) (*dtos.TransactionResponse, error)
 	DeleteTransaction(userID, transactionID uint) error
+	GetDashboardSummary() ([]*dtos.DashboardSummaryResponse, error)
 }
 
 type transactionUsecase struct {
@@ -166,4 +167,47 @@ func (u *transactionUsecase) DeleteTransaction(userID, transactionID uint) error
 	}
 
 	return nil
+}
+
+func (u *transactionUsecase) GetDashboardSummary() ([]*dtos.DashboardSummaryResponse, error) {
+	// total transaction
+	startDate := time.Now().Truncate(24 * time.Hour)
+	endDate := startDate.Add(24 * time.Hour)
+	totalTransaction, err := u.repo.GetTotalSuccessfullTransaction(startDate, endDate)
+	if err != nil {
+		return nil, errors.New("failed to get total transaction")
+	}
+
+	// avarage transaction
+	avarageTransaction, err := u.repo.GetAverageTransactionPerUser()
+	if err != nil {
+		return nil, errors.New("failed to get avarage transaction")
+	}
+
+	// lastest transaction
+	lastestTransaction, err := u.repo.GetLatestTransactions(10)
+	if err != nil {
+		return nil, errors.New("failed to get lastest transaction")
+	}
+
+	// convert to dto
+	var lastestTransactionDTO []dtos.TransactionResponse
+	for _, t := range lastestTransaction {
+		lastestTransactionDTO = append(lastestTransactionDTO, dtos.TransactionResponse{
+			ID:        t.ID,
+			UserID:    t.UserID,
+			Amount:    t.Amount,
+			Status:    t.Status,
+			CreatedAt: t.CreatedAt,
+		})
+	}
+
+	// response
+	response := &dtos.DashboardSummaryResponse{
+		TotalSuccessTransactions: totalTransaction,
+		AverageTransactionPerUser: avarageTransaction,
+		LatestTransactions:        lastestTransactionDTO,
+	}
+
+	return []*dtos.DashboardSummaryResponse{response}, nil
 }

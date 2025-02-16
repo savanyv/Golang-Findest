@@ -198,3 +198,17 @@ func (h *TransactionHandler) DeleteTransaction(c echo.Context) error {
 		"message": "successfully delete transaction",
 	})
 }
+
+func (h *TransactionHandler) GetDashboardSummary(c echo.Context) error {
+	response, err := h.usecase.GetDashboardSummary()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "successfully get dashboard summary",
+		"data": response,
+	})
+}

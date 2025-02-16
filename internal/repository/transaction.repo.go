@@ -14,6 +14,8 @@ type TransactionRepository interface {
 	GetTotalSuccessfullTransaction(startDate, endDate time.Time) (float64, error)
 	UpdateStatusTransaction(transactionID uint, status string) (*models.Transaction, error)
 	DeleteTransaction(transactionID uint) error
+	GetAverageTransactionPerUser() (float64, error)
+	GetLatestTransactions(limit int) ([]models.Transaction, error)
 }
 
 type transactionRepository struct {
@@ -95,4 +97,21 @@ func (r *transactionRepository) DeleteTransaction(transactionID uint) error {
 	}
 
 	return nil
+}
+
+func (r *transactionRepository) GetAverageTransactionPerUser() (float64, error) {
+	var average float64
+	if err := r.db.Model(&models.Transaction{}).
+		Select("COALESCE(AVG(amount), 0)").Scan(&average).Error; err != nil {
+		return 0, err
+	}
+	return average, nil
+}
+
+func (r *transactionRepository) GetLatestTransactions(limit int) ([]models.Transaction, error) {
+	var transactions []models.Transaction
+	if err := r.db.Order("created_at DESC").Limit(limit).Find(&transactions).Error; err != nil {
+		return nil, err
+	}
+	return transactions, nil
 }

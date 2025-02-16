@@ -19,3 +19,9 @@ type TransactionResponse struct {
 	Status    string  `json:"status"`
 	CreatedAt time.Time  `json:"created_at"`
 }
+
+type DashboardSummaryResponse struct {
+	TotalSuccessTransactions float64            `json:"total_success_transactions"`
+	AverageTransactionPerUser float64           `json:"average_transaction_per_user"`
+	LatestTransactions        []TransactionResponse `json:"latest_transactions"`
+}
