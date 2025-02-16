@@ -50,7 +50,9 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
 🔹Autentikasi
 
 - 🔐 Login
+
      endpoint: ```POST /api/login```
+
      Request:
      ```json
      {
@@ -71,7 +73,9 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
      }
      ```
 - 🔐 Register
+
      endpoint: ```POST /api/register```
+
      Request:
      ```json
      {
@@ -95,8 +99,11 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
 
 🔹 Transaksi
 - 📌 Buat transaksi baru
+
      endpoint: ```POST /api/transactions```
+
      Headers: ```Authorization: Bearer <token>```
+
      Request:
      ```json
      {
@@ -118,6 +125,7 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
      ```
 
 - 📌 Ambil Daftar Transaksi
+
      endpoint: ```GET /api/transactions?user_id=1&status=success```
      ```json
      {
@@ -135,8 +143,11 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
      ```
 
 - 📌 Ambil Transaksi Berdasarkan ID
+
      endpoint: ```GET /api/transactions/1```
+
      headers: ```Authorization: Bearer <token>```
+
      Response:
      ```json
      {
@@ -151,7 +162,9 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
      }
      ```
 - 📌 Update Status Transaksi
+
      endpoint: ```PUT /api/transactions/1```
+
      request:
      ```json
      {
@@ -173,8 +186,11 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
      ```
 
 - 📌 Delete Transaction
+
      endpoint: ```DELETE /api/transactions/1```
+
      headers: ```Authorization: Bearer <token>```
+
      response:
      ```json
      {
@@ -184,7 +200,9 @@ Backend API menggunakan **Golang**, **Echo Framework**, dan **GORM** untuk menge
 
 🔹Dashboard
 - 📊 Get Dashboard Summary
+
      endpoint: ```GET /api/dashboard/summary```
+     
      response:
      ```json
      {
